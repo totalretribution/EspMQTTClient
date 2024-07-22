@@ -2,32 +2,16 @@
 #define ESP_MQTT_CLIENT_H
 
 #include <ArduinoOTA.h>
-#include <PubSubClient.h>
+#include "esp-mqtt-wrapper.h"
 #include <vector>
 
-#ifdef ESP8266
+#include <WiFiClient.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
+#include "ESP32HTTPUpdateServer.h"
 
-  #include <ESP8266WiFi.h>
-  #include <ESP8266WebServer.h>
-  #include <ESP8266mDNS.h>
-  #include <ESP8266HTTPUpdateServer.h>
-
-  #define DEFAULT_MQTT_CLIENT_NAME "ESP8266"
-  #define ESPHTTPUpdateServer ESP8266HTTPUpdateServer
-  #define ESPmDNS ESP8266mDNS
-  #define WebServer ESP8266WebServer
-
-#else // for ESP32
-
-  #include <WiFiClient.h>
-  #include <WebServer.h>
-  #include <ESPmDNS.h>
-  #include "ESP32HTTPUpdateServer.h"
-
-  #define DEFAULT_MQTT_CLIENT_NAME "ESP32"
-  #define ESPHTTPUpdateServer ESP32HTTPUpdateServer
-
-#endif
+#define DEFAULT_MQTT_CLIENT_NAME "ESP32"
+#define ESPHTTPUpdateServer ESP32HTTPUpdateServer
 
 void onConnectionEstablished(); // MUST be implemented in your sketch. Called once everythings is connected (Wifi, mqtt).
 
@@ -65,7 +49,7 @@ private:
   bool _mqttLastWillRetain;
   unsigned int _failedMQTTConnectionAttemptCount;
 
-  PubSubClient _mqttClient;
+  esp_mqtt _mqttClient;
 
   struct TopicSubscriptionRecord {
     String topic;

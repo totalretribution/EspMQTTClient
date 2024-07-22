@@ -56,7 +56,7 @@ EspMQTTClient::EspMQTTClient(
   _mqttPassword(mqttPassword),
   _mqttClientName(mqttClientName),
   _mqttServerPort(mqttServerPort),
-  _mqttClient(mqttServerIp, mqttServerPort, _wifiClient)
+  _mqttClient(mqttServerIp, mqttServerPort)
 {
   // WiFi connection
   _handleWiFi = (wifiSsid != NULL);
@@ -74,6 +74,7 @@ EspMQTTClient::EspMQTTClient(
   _mqttLastWillMessage = 0;
   _mqttLastWillRetain = false;
   _mqttCleanSession = true;
+
   _mqttClient.setCallback([this](char* topic, uint8_t* payload, unsigned int length) {this->mqttMessageReceivedCallback(topic, payload, length);});
   _failedMQTTConnectionAttemptCount = 0;
 
@@ -278,7 +279,6 @@ bool EspMQTTClient::handleMQTT()
   // Get the current connextion status
   bool isMqttConnected = (isWifiConnected() && _mqttClient.connected());
 
-
   /***** Detect and handle the current MQTT handling state *****/
 
   // Connection established
@@ -308,7 +308,7 @@ bool EspMQTTClient::handleMQTT()
     {
       // Connection failed, plan another connection attempt
       _nextMqttConnectionAttemptMillis = millis() + _mqttReconnectionAttemptDelay;
-      _mqttClient.disconnect();
+      // _mqttClient.disconnect();
       _failedMQTTConnectionAttemptCount++;
 
       if (_enableDebugMessages)
@@ -429,7 +429,7 @@ bool EspMQTTClient::publish(const char* topic, const uint8_t* payload, unsigned 
     return false;
   }
 
-  bool success = _mqttClient.publish(topic, payload, plength, retain);
+  bool success = _mqttClient.publish(topic, payload, plength, retain, false);
 
   if (_enableDebugMessages)
   {
